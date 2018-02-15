@@ -5,11 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.ardapekis.mobile_vqa.MainActivity"
-    tools:showIn="@layout/activity_test">
+    tools:context="com.ardapekis.mobile_vqa.activities.Main.MainActivity"
+    tools:showIn="@layout/activity_main">
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/mainRecyclerView"
+        android:id="@+id/main_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"

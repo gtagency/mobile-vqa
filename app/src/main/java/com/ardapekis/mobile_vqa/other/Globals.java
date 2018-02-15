@@ -1,8 +1,11 @@
 package com.ardapekis.mobile_vqa.other;
 
-/**
- * Created by igolo on 15.02.2018.
- */
+import com.ardapekis.mobile_vqa.models.ImageData;
 
-public class Globals {
+import java.util.ArrayList;
+
+
+public final class Globals {
+
+    public static ArrayList<ImageData> imagesData = new ArrayList<>();
 }
