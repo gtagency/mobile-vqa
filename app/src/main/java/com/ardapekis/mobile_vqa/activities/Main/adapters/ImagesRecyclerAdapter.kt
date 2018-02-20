@@ -1,6 +1,7 @@
 package com.ardapekis.mobile_vqa.activities.Main.adapters
 
-import android.content.Context
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -10,15 +11,17 @@ import android.widget.ImageView
 import android.widget.TextView
 
 import com.ardapekis.mobile_vqa.R
+import com.ardapekis.mobile_vqa.activities.Main.MainActivity
 import com.ardapekis.mobile_vqa.activities.Question.QuestionActivity
 import com.ardapekis.mobile_vqa.models.ImageData
+import com.ardapekis.mobile_vqa.other.Globals
 
 import java.util.ArrayList
 
 /**
  * @author Ilya Golod
  */
-class ImagesRecyclerAdapter(val context: Context, val data: ArrayList<ImageData>)
+class ImagesRecyclerAdapter(val context: MainActivity, var data: ArrayList<ImageData>)
     : RecyclerView.Adapter<ImagesRecyclerAdapter.ViewHolder>() {
 
     class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
@@ -30,7 +33,6 @@ class ImagesRecyclerAdapter(val context: Context, val data: ArrayList<ImageData>
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
                 .inflate(R.layout.image_card_view, parent, false)
-        //view.setOnClickListener {_ -> onCardClick()}
         return ViewHolder(view)
     }
 
@@ -44,15 +46,39 @@ class ImagesRecyclerAdapter(val context: Context, val data: ArrayList<ImageData>
 
         imageView.setImageBitmap(data[position].bitmap)
         imageView.setOnClickListener {_ -> onCardClick(position)}
+        imageView.setOnLongClickListener {_ -> onCardLongClick(position)}
     }
 
     override fun getItemCount(): Int {
         return data.size
     }
 
-    fun onCardClick(position: Int) {
+    private fun onCardClick(position: Int) {
         val intent = Intent(context, QuestionActivity::class.java)
         intent.putExtra("ImageDataIndex", position)
         context.startActivity(intent)
+    }
+
+    private fun onCardLongClick(position: Int): Boolean{
+        val builder = AlertDialog.Builder(context);
+        builder.setTitle(R.string.delete_image)
+        builder.setPositiveButton(R.string.delete, DialogInterface.OnClickListener {_, _ -> run {
+            Globals.imagesData.removeAt(position)
+            notifyItemRemoved(position)
+            notifyItemRangeChanged(position, data.size)
+            notifyDataSetChanged()
+
+            val noItemsText = context.findViewById<TextView>(R.id.no_items_text_view);
+            if (Globals.imagesData.size == 0) {
+                 noItemsText.visibility = View.VISIBLE
+            } else {
+                noItemsText.visibility = View.INVISIBLE
+            }
+
+        }})
+        builder.setNegativeButton(R.string.cancel, DialogInterface.OnClickListener {_, _ -> })
+        val dialog: AlertDialog = builder.create()
+        dialog.show()
+        return true
     }
 }

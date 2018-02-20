@@ -7,4 +7,7 @@
     <string name="existing_image">Existing image</string>
     <string name="take_picture">Take a picture</string>
     <string name="no_items_to_display">No items to display</string>
+    <string name="delete_image">Delete this image?</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
 </resources>

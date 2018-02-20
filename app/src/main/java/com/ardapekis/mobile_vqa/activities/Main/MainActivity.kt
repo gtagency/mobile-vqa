@@ -53,7 +53,6 @@ class MainActivity : AppCompatActivity() {
 
         recycler.layoutManager = LinearLayoutManager(this)
 
-
         recycler.adapter = ImagesRecyclerAdapter(this, Globals.imagesData)
 
         if (Globals.imagesData.size == 0) {
