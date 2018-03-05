@@ -26,8 +26,10 @@ import android.graphics.BitmapFactory
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.FileProvider
-
-
+import android.widget.Toast
+import com.ardapekis.mobile_vqa.models.HttpHandler
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 
 
 /**
@@ -71,16 +73,20 @@ class MainActivity : AppCompatActivity() {
             LOAD_IMAGE_CODE -> {
                 if (resultCode == RESULT_OK && data != null) {
                     val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, data.data)
-                    val image = ImageData(UUID.randomUUID(), bitmap, Calendar.getInstance().time)
+                    val image = ImageData(UUID.randomUUID(), bitmap,
+                            data.data.path, Calendar.getInstance().time)
                     Globals.imagesData.add(image)
+                    uploadImage(image)
                 }
             }
             IMAGE_CAPTURE_CODE -> {
                 try {
                     val bitmap = getImageBitmap(curImageFile)
 
-                    val image = ImageData(UUID.randomUUID(), bitmap, Calendar.getInstance().time)
+                    val image = ImageData(UUID.randomUUID(), bitmap,
+                            curImageFile.absolutePath, Calendar.getInstance().time)
                     Globals.imagesData.add(image)
+                    uploadImage(image)
                 } catch (e: Exception) {
                         // in case no photo was taken, do nothing
                 }
@@ -113,7 +119,7 @@ class MainActivity : AppCompatActivity() {
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                     arrayOf(Manifest.permission.CAMERA),
-                    0);
+                    0)
         }
         if (intent.resolveActivity(packageManager) != null) {
             startActivityForResult(intent, IMAGE_CAPTURE_CODE)
@@ -137,6 +143,19 @@ class MainActivity : AppCompatActivity() {
         bmOptions.inPreferredConfig = Bitmap.Config.ARGB_8888;
 
         return BitmapFactory.decodeFile(file.absolutePath, bmOptions)
+    }
+
+    private fun uploadImage(data: ImageData) {
+
+        val context = this
+        doAsync {
+            val handler = HttpHandler(Globals.serverUrl)
+            val resp = handler.postImageData(data)
+            uiThread {
+                val toast = Toast.makeText(context, resp.toString(), Toast.LENGTH_SHORT)
+                toast.show()
+            }
+        }
     }
 
 }

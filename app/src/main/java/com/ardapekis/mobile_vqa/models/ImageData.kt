@@ -1,16 +1,16 @@
 package com.ardapekis.mobile_vqa.models
 
 import android.graphics.Bitmap
+import java.io.BufferedInputStream
+import java.net.HttpURLConnection
+import java.net.URL
 import java.util.Date
 import java.util.UUID
-
 
 /**
  * @author Ilya Golod
  */
-class ImageData(val uuid: UUID, val bitmap: Bitmap, val datetime: Date) {
-
-
+class ImageData(val uuid: UUID, val bitmap: Bitmap, val filename: String?, val datetime: Date) {
     var questions: ArrayList<String> = ArrayList()
         private set
 
@@ -21,5 +21,6 @@ class ImageData(val uuid: UUID, val bitmap: Bitmap, val datetime: Date) {
         questions.add(question)
         answers.add(answer)
     }
+
 
 }
