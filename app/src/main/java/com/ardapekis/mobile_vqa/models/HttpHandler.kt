@@ -48,6 +48,36 @@ class HttpHandler (val serverUrl: String) {
 
     }
 
+    fun getProcessed(uuid: UUID): Boolean {
+        val urlStr = "$serverUrl?uuid=$uuid"
+        val urlConnection: HttpURLConnection
+
+        return try {
+            urlConnection = URL(urlStr).openConnection() as HttpURLConnection
+            //urlConnection.connect()
+            urlConnection.requestMethod = "GET"
+            val rd = BufferedReader(InputStreamReader(urlConnection.inputStream))
+            var line: String
+            var resp = ""
+            while (true) {
+                try {
+                    line = rd.readLine()
+                    if (line == null)
+                        break
+                    resp += line
+                }
+                catch (e: Throwable) {
+                    break
+                }
+            }
+            rd.close()
+            urlConnection.disconnect()
+            resp == "True"
+        } catch (e: Throwable) {
+            false
+        }
+    }
+
     // For POST: uuid - semicolon - image
     fun postImageData(data: ImageData): Int {
         val bos = ByteArrayOutputStream()

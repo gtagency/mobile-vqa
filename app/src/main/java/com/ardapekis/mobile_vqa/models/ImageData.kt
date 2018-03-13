@@ -10,7 +10,9 @@ import java.util.UUID
 /**
  * @author Ilya Golod
  */
-class ImageData(val uuid: UUID, val bitmap: Bitmap, val filename: String?, val datetime: Date) {
+class ImageData(val uuid: UUID, val bitmap: Bitmap,
+                val filename: String?, val datetime: Date,
+                var processed: Boolean) {
     var questions: ArrayList<String> = ArrayList()
         private set
 

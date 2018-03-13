@@ -9,5 +9,5 @@ public final class Globals {
 
     public static ArrayList<ImageData> imagesData = new ArrayList<>();
 
-    public static String serverUrl = "http://143.215.125.87:81/";
+    public static String serverUrl = "http://143.215.115.166:81/";
 }

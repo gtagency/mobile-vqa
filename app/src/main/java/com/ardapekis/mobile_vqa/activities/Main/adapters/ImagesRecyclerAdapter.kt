@@ -41,8 +41,13 @@ class ImagesRecyclerAdapter(val context: MainActivity, var data: ArrayList<Image
         val textView = holder.textView
         val imageView = holder.imageView
 
-        val date = data[position].datetime
-        textView.text = date.toString()
+        //val date = data[position].datetime
+        if(data[position].processed) {
+            textView.visibility = View.INVISIBLE
+        } else {
+            textView.visibility = View.VISIBLE
+            textView.text = context.getString(R.string.Loading)
+        }
 
         imageView.setImageBitmap(data[position].bitmap)
         imageView.setOnClickListener {_ -> onCardClick(position)}
@@ -54,9 +59,11 @@ class ImagesRecyclerAdapter(val context: MainActivity, var data: ArrayList<Image
     }
 
     private fun onCardClick(position: Int) {
-        val intent = Intent(context, QuestionActivity::class.java)
-        intent.putExtra("ImageDataIndex", position)
-        context.startActivity(intent)
+        if (data[position].processed) {
+            val intent = Intent(context, QuestionActivity::class.java)
+            intent.putExtra("ImageDataIndex", position)
+            context.startActivity(intent)
+        }
     }
 
     private fun onCardLongClick(position: Int): Boolean{

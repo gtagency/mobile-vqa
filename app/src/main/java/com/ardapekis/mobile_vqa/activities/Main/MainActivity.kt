@@ -26,9 +26,12 @@ import android.graphics.BitmapFactory
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.FileProvider
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import com.ardapekis.mobile_vqa.models.HttpHandler
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.toolbar
 import org.jetbrains.anko.uiThread
 
 
@@ -49,6 +52,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        setSupportActionBar(toolbar_main)
 
         recycler = main_recycler_view
         noItemsText = no_items_text_view
@@ -67,6 +71,21 @@ class MainActivity : AppCompatActivity() {
         fab_take_picture.setOnClickListener { _ -> onCameraFabClick() }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        val id = item?.itemId
+
+        if (id == R.id.action_refresh) {
+            checkImagesProcessed()
+        }
+        recycler.adapter.notifyDataSetChanged()
+        return true
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
             when (requestCode) {
@@ -74,7 +93,7 @@ class MainActivity : AppCompatActivity() {
                 if (resultCode == RESULT_OK && data != null) {
                     val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, data.data)
                     val image = ImageData(UUID.randomUUID(), bitmap,
-                            data.data.path, Calendar.getInstance().time)
+                            data.data.path, Calendar.getInstance().time, false)
                     Globals.imagesData.add(image)
                     uploadImage(image)
                 }
@@ -84,7 +103,7 @@ class MainActivity : AppCompatActivity() {
                     val bitmap = getImageBitmap(curImageFile)
 
                     val image = ImageData(UUID.randomUUID(), bitmap,
-                            curImageFile.absolutePath, Calendar.getInstance().time)
+                            curImageFile.absolutePath, Calendar.getInstance().time, false)
                     Globals.imagesData.add(image)
                     uploadImage(image)
                 } catch (e: Exception) {
@@ -151,11 +170,26 @@ class MainActivity : AppCompatActivity() {
         doAsync {
             val handler = HttpHandler(Globals.serverUrl)
             val resp = handler.postImageData(data)
-            uiThread {
-                val toast = Toast.makeText(context, resp.toString(), Toast.LENGTH_SHORT)
-                toast.show()
+//            uiThread {
+//                val toast = Toast.makeText(context, resp.toString(), Toast.LENGTH_SHORT)
+//                toast.show()
+//            }
+        }
+    }
+
+    private fun checkImagesProcessed() {
+        val context = this
+        val toast = Toast.makeText(context, "Refreshing...", Toast.LENGTH_SHORT)
+        toast.show()
+
+        doAsync {
+            val handler = HttpHandler(Globals.serverUrl)
+            for (image in Globals.imagesData) {
+                val result = handler.getProcessed(image.uuid)
+                image.processed = result
             }
         }
+        recycler.adapter.notifyDataSetChanged()
     }
 
 }
